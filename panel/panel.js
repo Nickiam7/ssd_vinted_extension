@@ -106,6 +106,8 @@ function fieldRows(listing) {
     ["Category", listing.category],
     ["Brand", listing.brand],
     ["Condition", listing.condition],
+    ["Colors", listing.colors],
+    ["Material", listing.material],
     ["Size", listing.size],
     ["Price", priceLabel(listing)],
     ["Photos", photoLabel(listing)]

@@ -19,7 +19,11 @@
     conditionPrefix: "category-condition-single-list",
     packageRadios: "[data-testid^='package_type_selector_'][data-testid$='--input']",
     packageRecommendedRadio: '[data-testid="package_type_selector_1--input"]',
-    price: '[data-testid="price-input--input"]'
+    price: '[data-testid="price-input--input"]',
+    colorInput: '[data-testid="color-select-dropdown-input"]',
+    colorDropdown: '[data-testid="color-select-dropdown-content"]',
+    materialInput: '[data-testid="category-material-multi-list-input"]',
+    materialDropdown: '[data-testid="category-material-multi-list-content"]'
   };
 
   const PENDING_KEY = "ssdv-pending-listing";
@@ -159,6 +163,40 @@
     report.push({ field, status: "filled", note: value });
   }
 
+  // Colors and material are checkbox multi-selects in the same component
+  // family: clicking a titled cell toggles it, the dropdown stays open, and
+  // the input echoes the picks. Collapse by toggling the input when done.
+  async function fillMultiPick(field, inputSel, contentSel, values, report, { max } = {}) {
+    if (!values?.length) return report.push({ field, status: "skipped", note: "No value on the listing." });
+    const picks = max ? values.slice(0, max) : values;
+
+    if (!document.querySelector(inputSel)) {
+      return report.push({ field, status: "manual", note: "Field not present — it may need the category first." });
+    }
+    const content = await openDropdown(inputSel, contentSel);
+    if (!content) return report.push({ field, status: "manual", note: "Dropdown didn't open." });
+
+    const missing = [];
+    for (const value of picks) {
+      const cell = exactCell(content, value);
+      if (cell) {
+        cell.click();
+        await sleep(300);
+      } else {
+        missing.push(value);
+      }
+    }
+    document.querySelector(inputSel)?.click();
+    await sleep(300);
+
+    const chosen = document.querySelector(inputSel)?.value || "";
+    if (missing.length) {
+      report.push({ field, status: "manual", note: `Not in the list: ${missing.join(", ")}. Picked: ${chosen || "none"}.` });
+    } else {
+      report.push({ field, status: "filled", note: chosen || picks.join(", ") });
+    }
+  }
+
   async function dismissAuthenticityModal(report) {
     const heading = [...document.querySelectorAll("h1, h2, h3")]
       .find((el) => el.textContent.trim() === "Proof of authenticity");
@@ -207,6 +245,8 @@
     await fillFromDropdown("brand", SEL.brandPrefix, listing.brand, report);
     await dismissAuthenticityModal(report);
     await fillFromDropdown("condition", SEL.conditionPrefix, listing.condition, report);
+    await fillMultiPick("colors", SEL.colorInput, SEL.colorDropdown, listing.color_list, report, { max: 2 });
+    await fillMultiPick("material", SEL.materialInput, SEL.materialDropdown, listing.material_list, report);
     fillText("price", SEL.price, listing.price, report);
     await fillPackage(report);
     await dismissAuthenticityModal(report);
