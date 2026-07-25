@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "SSD Vinted Assistant",
+  "version": "0.1.0",
+  "description": "Autofills Vinted's sell form from your Style Savvy Div listings.",
+  "minimum_chrome_version": "114",
+  "permissions": ["sidePanel", "storage", "tabs"],
+  "host_permissions": [
+    "https://www.vinted.com/*",
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*"
+  ],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "side_panel": { "default_path": "panel/index.html" },
+  "options_page": "options/index.html",
+  "action": { "default_title": "Open SSD Vinted Assistant" },
+  "content_scripts": [
+    {
+      "matches": ["https://www.vinted.com/*"],
+      "js": ["content/vinted.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

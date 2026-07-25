@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SSD Vinted Assistant</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header class="panel-header">
+    <span class="brand-mark">SSD</span>
+    <div>
+      <h1>Ready to publish</h1>
+      <p class="subtitle">Queued listings from Style Savvy Div</p>
+    </div>
+    <button id="refresh" class="icon-btn" title="Refresh">&#8635;</button>
+  </header>
+
+  <main id="view"></main>
+
+  <template id="tpl-setup">
+    <div class="empty-state">
+      <p>Connect the assistant to your Style Savvy Div app first.</p>
+      <button class="btn btn-primary" data-action="open-options">Open settings</button>
+    </div>
+  </template>
+
+  <template id="tpl-error">
+    <div class="empty-state">
+      <p class="error-text"></p>
+      <button class="btn btn-outline" data-action="retry">Try again</button>
+    </div>
+  </template>
+
+  <template id="tpl-empty">
+    <div class="empty-state">
+      <p>No queued listings. Set a listing's status to <span class="badge badge-queued">Queued</span> in the app and it shows up here.</p>
+    </div>
+  </template>
+
+  <template id="tpl-listing-card">
+    <button class="listing-card">
+      <img class="cover" alt="">
+      <span class="meta">
+        <span class="title"></span>
+        <span class="price"></span>
+      </span>
+      <span class="chevron">&#8250;</span>
+    </button>
+  </template>
+
+  <template id="tpl-detail">
+    <div class="detail">
+      <button class="back-link" data-action="back">&#8249; All listings</button>
+      <div class="detail-head">
+        <img class="cover" alt="">
+        <div>
+          <h2 class="title"></h2>
+          <p class="price"></p>
+        </div>
+      </div>
+
+      <dl class="fields"></dl>
+
+      <div class="actions">
+        <button class="btn btn-outline" data-action="open-sell-form">Open sell form</button>
+        <button class="btn btn-primary" data-action="autofill">Autofill</button>
+      </div>
+      <p class="hint">Autofill runs on the active tab — have vinted.com/items/new open. You review and click Upload yourself.</p>
+
+      <div class="report" hidden>
+        <h3>Autofill report</h3>
+        <ul class="report-list"></ul>
+      </div>
+    </div>
+  </template>
+
+  <script type="module" src="panel.js"></script>
+</body>
+</html>
