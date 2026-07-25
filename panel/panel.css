@@ -217,6 +217,47 @@ main { padding: 12px; }
 .badge-skipped { color: var(--vinted-muted); background: rgba(92, 101, 102, 0.14); }
 .badge-published { color: var(--vinted-teal-dark); background: rgba(50, 118, 128, 0.14); }
 
+.loading-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  color: var(--vinted-muted);
+  font-size: 13px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--vinted-border);
+  border-top-color: var(--vinted-teal);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.skeleton-row {
+  height: 14px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--vinted-field) 25%, #e4ebeb 50%, var(--vinted-field) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.skeleton-row:nth-child(3) { width: 85%; }
+.skeleton-row:nth-child(4) { width: 70%; }
+.skeleton-row:nth-child(5) { width: 90%; }
+.skeleton-row:nth-child(6) { width: 60%; }
+
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}
+
 .toast {
   position: fixed;
   bottom: 12px;

@@ -152,11 +152,13 @@ async function runAutofill(listing, button) {
 
   button.disabled = true;
   button.textContent = "Filling…";
+  setReportLoading(true);
   try {
     const report = await send({ type: "autofill", listingId: listing.id, tabId: tab.id });
     renderReport(report);
     toast("Autofill finished — review the form, then click Upload on Vinted.");
   } catch (error) {
+    setReportLoading(false);
     toast(`Autofill failed: ${error.message}`);
   } finally {
     button.disabled = false;
@@ -164,11 +166,23 @@ async function runAutofill(listing, button) {
   }
 }
 
+function setReportLoading(loading) {
+  const box = view.querySelector(".report");
+  const spinner = view.querySelector(".report-loading");
+  const list = view.querySelector(".report-list");
+  if (!box || !spinner || !list) return;
+
+  box.hidden = false;
+  spinner.hidden = !loading;
+  if (loading) list.replaceChildren();
+}
+
 function renderReport(report) {
   const box = view.querySelector(".report");
   const list = view.querySelector(".report-list");
   if (!box || !list) return;
 
+  setReportLoading(false);
   list.replaceChildren();
   report.forEach(({ field, status, note }) => {
     const li = document.createElement("li");

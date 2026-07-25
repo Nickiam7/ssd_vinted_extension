@@ -42,13 +42,17 @@
   }
 
   // React tracks input state internally — assigning .value directly is
-  // invisible to it. Call the native setter, then dispatch input so React's
-  // root listener picks the change up.
+  // invisible to it. Mimic a real entry: focus, native-set, a typed-looking
+  // InputEvent, change, then blur. The blur matters — Vinted's price field
+  // parses on commit, and without it the form validates against the old
+  // (empty) internal value even though the new one is displayed.
   function setNativeValue(el, value) {
     const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+    el.focus();
     Object.getOwnPropertyDescriptor(proto, "value").set.call(el, value);
-    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: value }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
+    el.blur();
   }
 
   function b64ToFile({ name, type, dataB64 }) {
@@ -77,6 +81,28 @@
 
   function closeDropdowns() {
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  }
+
+  // Vinted's pickers don't toggle on input clicks while open — the chevron
+  // (.c-input__icon) is the real toggle. Escalate: chevron, outside click,
+  // Escape; report whether the dropdown actually went away.
+  async function closePicker(inputSel, contentSel) {
+    const stillOpen = () => Boolean(document.querySelector(contentSel));
+    if (!stillOpen()) return true;
+
+    const icon = document.querySelector(inputSel)?.closest(".c-input__content")?.querySelector(".c-input__icon");
+    if (icon) {
+      icon.click();
+      await sleep(300);
+      if (!stillOpen()) return true;
+    }
+    document.body.click();
+    await sleep(300);
+    if (!stillOpen()) return true;
+
+    closeDropdowns();
+    await sleep(300);
+    return !stillOpen();
   }
 
   // --- steps -------------------------------------------------------------
@@ -186,14 +212,14 @@
         missing.push(value);
       }
     }
-    document.querySelector(inputSel)?.click();
-    await sleep(300);
+    const closed = await closePicker(inputSel, contentSel);
 
     const chosen = document.querySelector(inputSel)?.value || "";
     if (missing.length) {
       report.push({ field, status: "manual", note: `Not in the list: ${missing.join(", ")}. Picked: ${chosen || "none"}.` });
     } else {
-      report.push({ field, status: "filled", note: chosen || picks.join(", ") });
+      const note = closed ? (chosen || picks.join(", ")) : `${chosen || picks.join(", ")} — dropdown wouldn't close, click elsewhere.`;
+      report.push({ field, status: "filled", note });
     }
   }
 
