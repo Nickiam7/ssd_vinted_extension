@@ -7,23 +7,32 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 });
 
-async function config() {
-  const stored = await chrome.storage.sync.get({ appUrl: "http://localhost:3000", apiToken: "" });
-  return { appUrl: stored.appUrl.replace(/\/+$/, ""), apiToken: stored.apiToken };
+// Host follows the install type: an unpacked (development) load talks to the
+// local Rails server; a packed/published build talks to production. No config
+// needed — getSelf() works without the "management" permission.
+async function baseUrl() {
+  const self = await chrome.management.getSelf();
+  return self.installType === "development" ? "http://localhost:3000" : "https://ssdvinted.com";
+}
+
+async function apiToken() {
+  const { apiToken } = await chrome.storage.sync.get({ apiToken: "" });
+  return apiToken;
 }
 
 async function api(path, options = {}) {
-  const { appUrl, apiToken } = await config();
-  if (!apiToken) throw new Error("Not configured — set the app URL and API token in the extension options.");
+  const token = await apiToken();
+  if (!token) throw new Error("No API token — paste one from your account settings into the panel.");
 
-  const response = await fetch(`${appUrl}${path}`, {
+  const response = await fetch(`${await baseUrl()}${path}`, {
     ...options,
     headers: {
-      "Authorization": `Token ${apiToken}`,
+      "Authorization": `Token ${token}`,
       "Content-Type": "application/json",
       ...(options.headers || {})
     }
   });
+  if (response.status === 401) throw new Error("unauthorized");
   if (!response.ok) throw new Error(`App API ${response.status} on ${path}`);
   return response.json();
 }
@@ -67,6 +76,9 @@ async function markPublished({ listingId, vintedItemId }) {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   const handlers = {
+    "token:get": () => apiToken().then((token) => ({ token })),
+    "token:set": () => chrome.storage.sync.set({ apiToken: message.token.trim() }).then(() => ({ ok: true })),
+    "app:settings-url": () => baseUrl().then((url) => ({ url: `${url}/users/edit` })),
     "api:listings": () => api("/api/v1/listings"),
     "api:listing": () => api(`/api/v1/listings/${message.listingId}`),
     "autofill": () => runAutofill(message),

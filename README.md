@@ -8,9 +8,13 @@ the assistant never submits anything.
 
 1. Open `chrome://extensions`, enable **Developer mode**.
 2. **Load unpacked** → pick this `extension/` directory.
-3. Click the extension's icon → the side panel opens. First run: open
-   **Settings** and enter the app URL (`http://localhost:3000`) and the API
-   token from Rails credentials (`extension.api_token`).
+3. Click the extension's icon → the side panel opens. First run: paste the
+   API token from your Style Savvy Div account settings (Account settings →
+   Browser extension → Generate token) into the panel and hit **Connect**.
+
+The host is automatic: an unpacked/development load talks to
+`http://localhost:3000`; a packed/published build talks to
+`https://ssdvinted.com` (via `chrome.management.getSelf().installType`).
 
 ## Flow
 
@@ -26,11 +30,12 @@ the assistant never submits anything.
 ## Layout
 
 - `background.js` — service worker; the only piece that talks to the app
-  (token auth, listing fetches, image bytes, the published callback).
-- `panel/` — the side panel UI (queued list, detail, autofill report).
+  (env host, token auth, listing fetches, image bytes, the published
+  callback).
+- `panel/` — the side panel UI (token entry, queued list, detail, autofill
+  report). Token entry lives here — no separate options page.
 - `content/vinted.js` — the autofill engine on vinted.com; selector map
   ported from the app's dry-run rehearsals. Every step degrades to
   "manual" in the report instead of aborting.
-- `options/` — app URL + API token settings.
 
 No build step: plain ES modules, load-unpacked, edit → reload.

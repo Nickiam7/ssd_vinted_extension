@@ -1,8 +1,10 @@
-// Side panel: the queued-listings work list and the autofill trigger. All
-// app traffic goes through the service worker, which holds the token.
+// Side panel: the queued-listings work list, token entry, and the autofill
+// trigger. All app traffic goes through the service worker, which holds the
+// token and knows the environment host.
 
 const view = document.getElementById("view");
-let currentListing = null;
+const settingsBtn = document.getElementById("settings");
+const refreshBtn = document.getElementById("refresh");
 
 function send(message) {
   return chrome.runtime.sendMessage(message).then((response) => {
@@ -19,6 +21,11 @@ function show(node) {
   view.replaceChildren(node);
 }
 
+function setChrome({ connected }) {
+  refreshBtn.hidden = !connected;
+  settingsBtn.hidden = !connected;
+}
+
 function toast(text) {
   const el = document.createElement("div");
   el.className = "toast";
@@ -29,10 +36,43 @@ function toast(text) {
 
 // --- views -----------------------------------------------------------------
 
+async function start() {
+  const { token } = await send({ type: "token:get" });
+  if (!token) return renderTokenEntry();
+  renderList();
+}
+
+function renderTokenEntry({ error } = {}) {
+  setChrome({ connected: false });
+  const node = template("tpl-token");
+  const input = node.querySelector(".token-input");
+  if (error) {
+    const banner = node.querySelector(".token-error");
+    banner.textContent = error;
+    banner.hidden = false;
+  }
+  const save = () => saveToken(input.value);
+  node.querySelector("[data-action=save-token]").addEventListener("click", save);
+  input.addEventListener("keydown", (event) => { if (event.key === "Enter") save(); });
+  node.querySelector("[data-action=open-settings]").addEventListener("click", async (event) => {
+    event.preventDefault();
+    const { url } = await send({ type: "app:settings-url" });
+    chrome.tabs.create({ url });
+  });
+  show(node);
+  setTimeout(() => input.focus(), 0);
+}
+
+async function saveToken(value) {
+  if (!value.trim()) return;
+  await send({ type: "token:set", token: value });
+  renderList();
+}
+
 async function renderList() {
-  currentListing = null;
   try {
     const { listings } = await send({ type: "api:listings" });
+    setChrome({ connected: true });
     if (!listings.length) return show(template("tpl-empty"));
 
     const wrap = document.createDocumentFragment();
@@ -55,7 +95,7 @@ async function renderList() {
 async function renderDetail(listingId) {
   try {
     const { listing } = await send({ type: "api:listing", listingId });
-    currentListing = listing;
+    setChrome({ connected: true });
 
     const node = template("tpl-detail");
     node.querySelector(".title").textContent = listing.title;
@@ -92,10 +132,12 @@ async function renderDetail(listingId) {
 }
 
 function renderError(error) {
-  const node = template(error.message.includes("Not configured") ? "tpl-setup" : "tpl-error");
-  node.querySelector(".error-text")?.append(error.message);
-  node.querySelector("[data-action=open-options]")?.addEventListener("click", () => chrome.runtime.openOptionsPage());
-  node.querySelector("[data-action=retry]")?.addEventListener("click", renderList);
+  if (error.message === "unauthorized") {
+    return renderTokenEntry({ error: "That token was rejected. Generate a fresh one in account settings." });
+  }
+  const node = template("tpl-error");
+  node.querySelector(".error-text").textContent = error.message;
+  node.querySelector("[data-action=retry]").addEventListener("click", renderList);
   show(node);
 }
 
@@ -205,7 +247,13 @@ function renderReport(report) {
 
 // --- wiring ------------------------------------------------------------------
 
-document.getElementById("refresh").addEventListener("click", renderList);
+refreshBtn.addEventListener("click", renderList);
+settingsBtn.addEventListener("click", async () => {
+  const { token } = await send({ type: "token:get" });
+  renderTokenEntry();
+  const input = view.querySelector(".token-input");
+  if (input) input.value = token || "";
+});
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "listing-published") {
@@ -214,4 +262,4 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
-renderList();
+start();

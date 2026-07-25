@@ -7,12 +7,12 @@
   "permissions": ["sidePanel", "storage", "tabs"],
   "host_permissions": [
     "https://www.vinted.com/*",
+    "https://ssdvinted.com/*",
     "http://localhost:3000/*",
     "http://127.0.0.1:3000/*"
   ],
   "background": { "service_worker": "background.js", "type": "module" },
   "side_panel": { "default_path": "panel/index.html" },
-  "options_page": "options/index.html",
   "action": { "default_title": "Open SSD Vinted Assistant" },
   "content_scripts": [
     {

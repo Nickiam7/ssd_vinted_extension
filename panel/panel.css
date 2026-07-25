@@ -22,40 +22,55 @@ body {
   font-size: 14px;
   color: var(--vinted-ink);
   background: #f6f8f8;
+  padding: 14px;
+}
+
+/* Wordmark sits above the card, mirroring the app's brand-logo */
+.wordmark {
+  padding: 2px 4px 12px;
+}
+
+.wordmark-name {
+  display: block;
+  font-size: 1.35rem;
+  line-height: 1.05;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  color: var(--vinted-dark-green, #225056);
+}
+
+.wordmark-vinted {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--vinted-ink);
+}
+
+.panel-card {
+  background: var(--vinted-bg);
+  border: 1px solid var(--vinted-border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(23, 23, 23, 0.05);
 }
 
 .panel-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   padding: 14px 16px;
-  background: var(--vinted-bg);
   border-bottom: 1px solid var(--vinted-border);
-  position: sticky;
-  top: 0;
-  z-index: 2;
 }
 
 .panel-header h1 { margin: 0; font-size: 15px; }
 .panel-header .subtitle { margin: 0; font-size: 12px; color: var(--vinted-muted); }
-
-.brand-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: var(--vinted-gradient);
-  color: #fff;
-  font-weight: 800;
-  font-style: italic;
-  font-size: 11px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
+.header-actions { display: flex; gap: 6px; }
 
 .icon-btn {
-  margin-left: auto;
   border: 1px solid var(--vinted-border);
   background: var(--vinted-bg);
   border-radius: 8px;
@@ -66,8 +81,42 @@ body {
   cursor: pointer;
 }
 .icon-btn:hover { color: var(--vinted-teal); border-color: var(--vinted-teal); }
+.icon-btn[hidden] { display: none; }
 
-main { padding: 12px; }
+main { padding: 12px 16px 16px; }
+
+/* Token entry */
+.token-entry p {
+  margin: 4px 0 12px;
+  color: var(--vinted-muted);
+  font-size: 13px;
+}
+.token-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--vinted-border);
+  border-radius: 8px;
+  font-family: var(--vinted-font);
+  font-size: 14px;
+  background: var(--vinted-field);
+  margin-bottom: 10px;
+}
+.token-input:focus {
+  outline: none;
+  border-color: var(--vinted-teal);
+  box-shadow: 0 0 0 3px rgba(50, 118, 128, 0.2);
+}
+.token-entry .btn-primary { width: 100%; }
+.token-error {
+  color: #b02a37 !important;
+  font-size: 12px;
+}
+.token-help {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--vinted-teal);
+}
 
 .btn {
   font-family: var(--vinted-font);
@@ -85,10 +134,7 @@ main { padding: 12px; }
 .btn-outline:hover { background: var(--vinted-teal-tint); }
 
 .empty-state {
-  background: var(--vinted-bg);
-  border: 1px solid var(--vinted-border);
-  border-radius: 12px;
-  padding: 20px;
+  padding: 12px 4px;
   text-align: center;
   color: var(--vinted-muted);
 }
@@ -102,12 +148,13 @@ main { padding: 12px; }
   text-align: left;
   background: var(--vinted-bg);
   border: 1px solid var(--vinted-border);
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 10px;
   margin-bottom: 8px;
   cursor: pointer;
   font-family: var(--vinted-font);
 }
+.listing-card:last-child { margin-bottom: 0; }
 .listing-card:hover { border-color: var(--vinted-teal); }
 .listing-card .cover, .detail-head .cover {
   width: 48px;
@@ -144,9 +191,8 @@ main { padding: 12px; }
 .detail-head .price { margin: 2px 0 0; color: var(--vinted-muted); }
 
 .fields {
-  background: var(--vinted-bg);
   border: 1px solid var(--vinted-border);
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 4px 12px;
   margin: 0 0 12px;
 }
@@ -188,10 +234,8 @@ main { padding: 12px; }
 
 .report {
   margin-top: 14px;
-  background: var(--vinted-bg);
-  border: 1px solid var(--vinted-border);
-  border-radius: 12px;
-  padding: 12px;
+  border-top: 1px solid var(--vinted-border);
+  padding-top: 12px;
 }
 .report h3 { margin: 0 0 8px; font-size: 13px; }
 .report-list { list-style: none; margin: 0; padding: 0; }

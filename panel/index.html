@@ -8,21 +8,33 @@
   <link rel="stylesheet" href="panel.css">
 </head>
 <body>
-  <header class="panel-header">
-    <span class="brand-mark">SSD</span>
-    <div>
-      <h1>Ready to publish</h1>
-      <p class="subtitle">Queued listings from Style Savvy Div</p>
-    </div>
-    <button id="refresh" class="icon-btn" title="Refresh">&#8635;</button>
-  </header>
+  <div class="wordmark">
+    <span class="wordmark-name">Style Savvy Div</span>
+    <span class="wordmark-vinted">Vinted</span>
+  </div>
 
-  <main id="view"></main>
+  <section class="panel-card">
+    <header class="panel-header">
+      <div>
+        <h1>Ready to publish</h1>
+        <p class="subtitle">Queued listings</p>
+      </div>
+      <div class="header-actions">
+        <button id="settings" class="icon-btn" title="Change API token" hidden>&#9881;</button>
+        <button id="refresh" class="icon-btn" title="Refresh" hidden>&#8635;</button>
+      </div>
+    </header>
 
-  <template id="tpl-setup">
-    <div class="empty-state">
-      <p>Connect the assistant to your Style Savvy Div app first.</p>
-      <button class="btn btn-primary" data-action="open-options">Open settings</button>
+    <main id="view"></main>
+  </section>
+
+  <template id="tpl-token">
+    <div class="token-entry">
+      <p>Paste the API token from your Style Savvy Div account settings to connect.</p>
+      <input type="password" class="token-input" placeholder="API token" autocomplete="off" spellcheck="false">
+      <p class="token-error" hidden></p>
+      <button class="btn btn-primary" data-action="save-token">Connect</button>
+      <a href="#" class="token-help" data-action="open-settings">Where do I find this?</a>
     </div>
   </template>
 
