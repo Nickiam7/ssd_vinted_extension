@@ -13,7 +13,19 @@
   ],
   "background": { "service_worker": "background.js", "type": "module" },
   "side_panel": { "default_path": "panel/index.html" },
-  "action": { "default_title": "Open SSD Vinted Assistant" },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Open SSD Vinted Assistant",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
   "content_scripts": [
     {
       "matches": ["https://www.vinted.com/*"],
