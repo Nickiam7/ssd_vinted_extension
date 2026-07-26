@@ -226,11 +226,22 @@ main { padding: 12px 16px 16px; }
   cursor: pointer;
   font-size: 12px;
   flex-shrink: 0;
+  font-family: var(--vinted-font);
 }
+
+.fields-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.fields-title { font-weight: 600; font-size: 13px; }
+.copy-all { font-weight: 600; }
 
 .actions { display: flex; gap: 8px; }
 .actions .btn { flex: 1; }
 .hint { color: var(--vinted-muted); font-size: 12px; margin: 8px 0 0; }
+.hint-link { color: var(--vinted-teal); }
 
 .report {
   margin-top: 14px;

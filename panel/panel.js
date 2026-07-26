@@ -121,7 +121,16 @@ async function renderDetail(listingId) {
     });
 
     node.querySelector("[data-action=back]").addEventListener("click", renderList);
-    node.querySelector("[data-action=open-sell-form]").addEventListener("click", openSellForm);
+    node.querySelector("[data-action=open-sell-form]").addEventListener("click", (event) => {
+      event.preventDefault();
+      openSellForm();
+    });
+    node.querySelector("[data-action=copy-all]").addEventListener("click", (event) => {
+      navigator.clipboard.writeText(copyAllText(listing));
+      const button = event.currentTarget;
+      button.textContent = "Copied";
+      setTimeout(() => (button.textContent = "Copy all"), 1500);
+    });
     node.querySelector("[data-action=autofill]").addEventListener("click", (event) =>
       runAutofill(listing, event.currentTarget));
 
@@ -154,6 +163,15 @@ function fieldRows(listing) {
     ["Price", priceLabel(listing)],
     ["Photos", photoLabel(listing)]
   ];
+}
+
+// Every field's value except the Photos count (and the photos themselves),
+// nicely spaced for pasting.
+function copyAllText(listing) {
+  return fieldRows(listing)
+    .filter(([label, value]) => label !== "Photos" && value)
+    .map(([label, value]) => `${label}\n${value}`)
+    .join("\n\n");
 }
 
 function priceLabel(listing) {
