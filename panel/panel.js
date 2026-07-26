@@ -34,6 +34,14 @@ function toast(text) {
   setTimeout(() => el.remove(), 4000);
 }
 
+// Copy to clipboard with a brief "Copied" flash on the triggering button.
+function copyWithFeedback(button, text) {
+  const label = button.textContent;
+  navigator.clipboard.writeText(text);
+  button.textContent = "Copied";
+  setTimeout(() => (button.textContent = label), 1500);
+}
+
 // --- views -----------------------------------------------------------------
 
 async function start() {
@@ -115,7 +123,7 @@ async function renderDetail(listingId) {
       const copy = document.createElement("button");
       copy.className = "copy-btn";
       copy.textContent = "Copy";
-      copy.addEventListener("click", () => navigator.clipboard.writeText(value));
+      copy.addEventListener("click", () => copyWithFeedback(copy, value));
       row.append(dt, dd, copy);
       fields.appendChild(row);
     });
@@ -125,12 +133,8 @@ async function renderDetail(listingId) {
       event.preventDefault();
       openSellForm();
     });
-    node.querySelector("[data-action=copy-all]").addEventListener("click", (event) => {
-      navigator.clipboard.writeText(copyAllText(listing));
-      const button = event.currentTarget;
-      button.textContent = "Copied";
-      setTimeout(() => (button.textContent = "Copy all"), 1500);
-    });
+    node.querySelector("[data-action=copy-all]").addEventListener("click", (event) =>
+      copyWithFeedback(event.currentTarget, copyAllText(listing)));
     node.querySelector("[data-action=autofill]").addEventListener("click", (event) =>
       runAutofill(listing, event.currentTarget));
 
