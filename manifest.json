@@ -8,6 +8,7 @@
   "host_permissions": [
     "https://www.vinted.com/*",
     "https://ssdvinted.com/*",
+    "https://*.digitaloceanspaces.com/*",
     "http://localhost:3000/*",
     "http://127.0.0.1:3000/*"
   ],
