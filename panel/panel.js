@@ -50,15 +50,28 @@ async function start() {
   renderList();
 }
 
-function renderTokenEntry({ error } = {}) {
+async function renderTokenEntry({ error } = {}) {
   setChrome({ connected: false });
+  const { token, host, forceProd } = await send({ type: "token:get" });
+
   const node = template("tpl-token");
   const input = node.querySelector(".token-input");
+  input.value = token || "";
   if (error) {
     const banner = node.querySelector(".token-error");
     banner.textContent = error;
     banner.hidden = false;
   }
+
+  const toggle = node.querySelector(".token-prod-toggle");
+  const target = node.querySelector(".target-host");
+  toggle.checked = forceProd;
+  target.textContent = host;
+  toggle.addEventListener("change", async () => {
+    const result = await send({ type: "host:set", forceProd: toggle.checked });
+    target.textContent = result.host;
+  });
+
   const save = () => saveToken(input.value);
   node.querySelector("[data-action=save-token]").addEventListener("click", save);
   input.addEventListener("keydown", (event) => { if (event.key === "Enter") save(); });
@@ -270,12 +283,7 @@ function renderReport(report) {
 // --- wiring ------------------------------------------------------------------
 
 refreshBtn.addEventListener("click", renderList);
-settingsBtn.addEventListener("click", async () => {
-  const { token } = await send({ type: "token:get" });
-  renderTokenEntry();
-  const input = view.querySelector(".token-input");
-  if (input) input.value = token || "";
-});
+settingsBtn.addEventListener("click", () => renderTokenEntry());
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "listing-published") {

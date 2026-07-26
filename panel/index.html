@@ -32,8 +32,13 @@
     <div class="token-entry">
       <p>Paste the API token from your Style Savvy Div account settings to connect.</p>
       <input type="password" class="token-input" placeholder="API token" autocomplete="off" spellcheck="false">
+      <label class="token-toggle">
+        <input type="checkbox" class="token-prod-toggle">
+        <span>Connect to production (ssdvinted.com)</span>
+      </label>
       <p class="token-error" hidden></p>
       <button class="btn btn-primary" data-action="save-token">Connect</button>
+      <p class="token-target">Target: <span class="target-host"></span></p>
       <a href="#" class="token-help" data-action="open-settings">Where do I find this?</a>
     </div>
   </template>

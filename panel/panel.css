@@ -107,6 +107,20 @@ main { padding: 12px 16px 16px; }
   box-shadow: 0 0 0 3px rgba(50, 118, 128, 0.2);
 }
 .token-entry .btn-primary { width: 100%; }
+.token-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.token-toggle input { accent-color: var(--vinted-teal); }
+.token-target {
+  margin: 10px 0 0 !important;
+  font-size: 12px;
+}
+.token-target .target-host { color: var(--vinted-teal); font-weight: 600; }
 .token-error {
   color: #b02a37 !important;
   font-size: 12px;

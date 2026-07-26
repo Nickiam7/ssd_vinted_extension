@@ -8,9 +8,12 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // Host follows the install type: an unpacked (development) load talks to the
-// local Rails server; a packed/published build talks to production. No config
-// needed — getSelf() works without the "management" permission.
+// local Rails server; a packed/published build talks to production. The
+// stored override forces production from an unpacked copy (toggle on the
+// panel's token screen).
 async function baseUrl() {
+  const { forceProd } = await chrome.storage.sync.get({ forceProd: false });
+  if (forceProd) return "https://ssdvinted.com";
   const self = await chrome.management.getSelf();
   return self.installType === "development" ? "http://localhost:3000" : "https://ssdvinted.com";
 }
@@ -76,8 +79,13 @@ async function markPublished({ listingId, vintedItemId }) {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   const handlers = {
-    "token:get": () => apiToken().then((token) => ({ token })),
+    "token:get": () =>
+      Promise.all([apiToken(), baseUrl(), chrome.storage.sync.get({ forceProd: false })])
+        .then(([token, host, { forceProd }]) => ({ token, host, forceProd })),
     "token:set": () => chrome.storage.sync.set({ apiToken: message.token.trim() }).then(() => ({ ok: true })),
+    "host:set": () =>
+      chrome.storage.sync.set({ forceProd: Boolean(message.forceProd) })
+        .then(baseUrl).then((host) => ({ host })),
     "app:settings-url": () => baseUrl().then((url) => ({ url: `${url}/users/edit` })),
     "api:listings": () => api("/api/v1/listings"),
     "api:listing": () => api(`/api/v1/listings/${message.listingId}`),

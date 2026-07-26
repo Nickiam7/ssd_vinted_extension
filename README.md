@@ -15,6 +15,8 @@ the assistant never submits anything.
 The host is automatic: an unpacked/development load talks to
 `http://localhost:3000`; a packed/published build talks to
 `https://ssdvinted.com` (via `chrome.management.getSelf().installType`).
+The "Connect to production" toggle on the token screen overrides this, so
+an unpacked copy can point at ssdvinted.com.
 
 ## Flow
 
