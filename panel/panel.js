@@ -38,7 +38,7 @@ function toast(text) {
 function copyWithFeedback(button, text) {
   const label = button.textContent;
   navigator.clipboard.writeText(text);
-  button.textContent = "Copied";
+  button.textContent = "Copied!";
   setTimeout(() => (button.textContent = label), 1500);
 }
 
